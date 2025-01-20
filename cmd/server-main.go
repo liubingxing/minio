@@ -1026,6 +1026,7 @@ func serverMain(ctx *cli.Context) {
 
 		// Initialize data scanner.
 		bootstrapTrace("initDataScanner", func() {
+			logger.Info("Initializing data scanner with _MINIO_SCANNER=%s", config.EnableOn)
 			if v := env.Get("_MINIO_SCANNER", config.EnableOn); v == config.EnableOn {
 				initDataScanner(GlobalContext, newObject)
 			}

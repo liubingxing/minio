@@ -844,7 +844,7 @@ func (a adminAPIHandlers) MetricsHandler(w http.ResponseWriter, r *http.Request)
 // Get server/cluster data usage info
 func (a adminAPIHandlers) DataUsageInfoHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-
+	logger.Info("DataUsageInfoHandler")
 	objectAPI, _ := validateAdminReq(ctx, w, r, policy.DataUsageInfoAdminAction)
 	if objectAPI == nil {
 		return

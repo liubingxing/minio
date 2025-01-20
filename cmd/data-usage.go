@@ -20,6 +20,7 @@ package cmd
 import (
 	"context"
 	"errors"
+	"github.com/minio/minio/internal/logger"
 	"strings"
 	"time"
 
@@ -111,11 +112,13 @@ func loadPrefixUsageFromBackend(ctx context.Context, objAPI ObjectLayer, bucket 
 }
 
 func loadDataUsageFromBackend(ctx context.Context, objAPI ObjectLayer) (DataUsageInfo, error) {
+	logger.Info("loadDataUsageFromBackend: path %v\n", dataUsageObjNamePath)
 	buf, err := readConfig(ctx, objAPI, dataUsageObjNamePath)
 	if err != nil {
 		buf, err = readConfig(ctx, objAPI, dataUsageObjNamePath+".bkp")
 		if err != nil {
 			if errors.Is(err, errConfigNotFound) {
+				logger.Info("loadDataUsageFromBackend: errConfigNotFound\n")
 				return DataUsageInfo{}, nil
 			}
 			return DataUsageInfo{}, toObjectErr(err, minioMetaBucket, dataUsageObjNamePath)
@@ -127,6 +130,7 @@ func loadDataUsageFromBackend(ctx context.Context, objAPI ObjectLayer) (DataUsag
 	if err = json.Unmarshal(buf, &dataUsageInfo); err != nil {
 		return DataUsageInfo{}, err
 	}
+	logger.Info("loadDataUsageFromBackend: dataUsageInfo %v\n", dataUsageInfo)
 	// For forward compatibility reasons, we need to add this code.
 	if len(dataUsageInfo.BucketsUsage) == 0 {
 		dataUsageInfo.BucketsUsage = make(map[string]BucketUsageInfo, len(dataUsageInfo.BucketSizes))

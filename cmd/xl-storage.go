@@ -24,6 +24,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"go.uber.org/zap"
 	"io"
 	"os"
 	pathutil "path"
@@ -2611,6 +2612,8 @@ func (s *xlStorage) RenameData(ctx context.Context, srcVolume, srcPath string, f
 	srcFilePath := pathutil.Join(srcVolumeDir, pathJoin(srcPath, xlStorageFormatFile))
 	dstFilePath := pathutil.Join(dstVolumeDir, pathJoin(dstPath, xlStorageFormatFile))
 
+	logger.Info("RenameData srcFilePath %v dstFilePath %v", srcFilePath, dstFilePath)
+
 	var srcDataPath string
 	var dstDataPath string
 	var dataDir string
@@ -2623,6 +2626,7 @@ func (s *xlStorage) RenameData(ctx context.Context, srcVolume, srcPath string, f
 		// it would additionally add `/` at the end and it comes in the
 		// way of renameAll(), parentDir creation.
 		dstDataPath = pathutil.Join(dstVolumeDir, dstPath, dataDir)
+		logger.Info("RenameData srcDataPath %v dstDataPath %v", srcDataPath, dstDataPath)
 	}
 
 	if err = checkPathLength(srcFilePath); err != nil {
@@ -2665,7 +2669,7 @@ func (s *xlStorage) RenameData(ctx context.Context, srcVolume, srcPath string, f
 			}
 		}
 	}
-
+	logger.Info("RenameData dstBuf len %v", len(dstBuf))
 	// Preserve all the legacy data, could be slow, but at max there can be 10,000 parts.
 	currentDataPath := pathJoin(dstVolumeDir, dstPath)
 
@@ -2876,6 +2880,7 @@ func (s *xlStorage) RenameData(ctx context.Context, srcVolume, srcPath string, f
 			return res, osErrToFileErr(err)
 		}
 		diskHealthCheckOK(ctx, err)
+		logger.Info("Successfully renamed data", zap.String("source", srcDataPath), zap.String("destination", dstDataPath))
 	}
 
 	// If we have oldDataDir then we must preserve current xl.meta
@@ -2910,6 +2915,7 @@ func (s *xlStorage) RenameData(ctx context.Context, srcVolume, srcPath string, f
 		s.deleteFile(dstVolumeDir, dstDataPath, false, false)
 		return res, osErrToFileErr(err)
 	}
+	logger.Info("Successfully renamed meta", zap.String("source", srcFilePath), zap.String("destination", dstFilePath))
 
 	if srcVolume != minioMetaMultipartBucket {
 		// srcFilePath is some-times minioMetaTmpBucket, an attempt to

@@ -23,6 +23,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"go.uber.org/zap"
 	"io"
 	"net/http"
 	"path"
@@ -1327,7 +1328,7 @@ func (er erasureObjects) putObject(ctx context.Context, bucket string, object st
 
 	// Initialize parts metadata
 	partsMetadata := make([]FileInfo, len(storageDisks))
-
+	logger.Info("putObject %v", pathJoin(bucket, object))
 	fi := newFileInfo(pathJoin(bucket, object), dataDrives, parityDrives)
 	fi.VersionID = opts.VersionID
 	if opts.Versioned && fi.VersionID == "" {
@@ -1377,11 +1378,13 @@ func (er erasureObjects) putObject(ctx context.Context, bucket string, object st
 
 	partName := "part.1"
 	tempErasureObj := pathJoin(uniqueID, fi.DataDir, partName)
+	logger.Info("putObject tempErasureObj %v", pathJoin(uniqueID, fi.DataDir, partName))
 
 	defer er.deleteAll(context.Background(), minioMetaTmpBucket, tempObj)
 
 	var inlineBuffers []*bytes.Buffer
 	if globalStorageClass.ShouldInline(erasure.ShardFileSize(data.ActualSize()), opts.Versioned) {
+		logger.Info("putObject inline %v", erasure.ShardFileSize(data.ActualSize()))
 		inlineBuffers = make([]*bytes.Buffer, len(onlineDisks))
 	}
 
@@ -1403,7 +1406,7 @@ func (er erasureObjects) putObject(ctx context.Context, bucket string, object st
 			writers[i] = newStreamingBitrotWriterBuffer(inlineBuffers[i], DefaultBitrotAlgorithm, erasure.ShardSize())
 			continue
 		}
-
+		logger.Info("putObject disk %v, shardSize %v, erasure.ShardSize %v", disk.String(), shardFileSize, erasure.ShardSize())
 		writers[i] = newBitrotWriter(disk, bucket, minioMetaTmpBucket, tempErasureObj, shardFileSize, DefaultBitrotAlgorithm, erasure.ShardSize())
 	}
 
@@ -1792,6 +1795,7 @@ func (er erasureObjects) DeleteObjects(ctx context.Context, bucket string, objec
 }
 
 func (er erasureObjects) commitRenameDataDir(ctx context.Context, bucket, object, dataDir string, onlineDisks []StorageAPI, writeQuorum int) error {
+	logger.Info("Committing rename data dir", zap.String("bucket", bucket), zap.String("object", object), zap.String("dataDir", dataDir))
 	if dataDir == "" {
 		return nil
 	}

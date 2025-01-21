@@ -286,7 +286,8 @@ func (sCfg *Config) ShouldInline(shardSize int64, versioned bool) bool {
 		inlineBlock = sCfg.inlineBlock
 	}
 	ConfigLock.RUnlock()
-    logger.Info("ShouldInline sCfg.initialized %v, inlineBlock %v", sCfg.initialized, inlineBlock)
+    logger.Info("ShouldInline sCfg.initialized %v, inlineBlock %v shardSize %v versioned %v",
+    	sCfg.initialized, inlineBlock, shardSize, versioned)
 	if versioned {
 		return shardSize <= inlineBlock/8
 	}

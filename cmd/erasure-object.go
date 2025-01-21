@@ -1328,7 +1328,8 @@ func (er erasureObjects) putObject(ctx context.Context, bucket string, object st
 
 	// Initialize parts metadata
 	partsMetadata := make([]FileInfo, len(storageDisks))
-	logger.Info("putObject %v", pathJoin(bucket, object))
+	fmt.Printf("putObject %v", pathJoin(bucket, object))
+	logger.Info("putObjectl %v", pathJoin(bucket, object))
 	fi := newFileInfo(pathJoin(bucket, object), dataDrives, parityDrives)
 	fi.VersionID = opts.VersionID
 	if opts.Versioned && fi.VersionID == "" {

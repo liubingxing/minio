@@ -1328,8 +1328,7 @@ func (er erasureObjects) putObject(ctx context.Context, bucket string, object st
 
 	// Initialize parts metadata
 	partsMetadata := make([]FileInfo, len(storageDisks))
-	fmt.Printf("putObject %v", pathJoin(bucket, object))
-	logger.Info("putObjectl %v", pathJoin(bucket, object))
+	logger.Info("putObject %v", pathJoin(bucket, object))
 	fi := newFileInfo(pathJoin(bucket, object), dataDrives, parityDrives)
 	fi.VersionID = opts.VersionID
 	if opts.Versioned && fi.VersionID == "" {
@@ -1385,7 +1384,7 @@ func (er erasureObjects) putObject(ctx context.Context, bucket string, object st
 
 	var inlineBuffers []*bytes.Buffer
 	if globalStorageClass.ShouldInline(erasure.ShardFileSize(data.ActualSize()), opts.Versioned) {
-		logger.Info("putObject inline %v", erasure.ShardFileSize(data.ActualSize()))
+		logger.Info("putObject inline %v %v %v", erasure.blockSize, erasure.ShardSize(), erasure.ShardFileSize(data.ActualSize()))
 		inlineBuffers = make([]*bytes.Buffer, len(onlineDisks))
 	}
 

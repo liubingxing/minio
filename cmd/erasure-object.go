@@ -1383,8 +1383,10 @@ func (er erasureObjects) putObject(ctx context.Context, bucket string, object st
 	defer er.deleteAll(context.Background(), minioMetaTmpBucket, tempObj)
 
 	var inlineBuffers []*bytes.Buffer
+	logger.Info("putObject inline %v %v %v %v %v %v %v",
+		erasure.blockSize, erasure.ShardSize(), erasure.dataBlocks, data.ActualSize(), data.Size(),
+		erasure.ShardFileSize(data.ActualSize()), erasure.ShardFileSize(data.Size()))
 	if globalStorageClass.ShouldInline(erasure.ShardFileSize(data.ActualSize()), opts.Versioned) {
-		logger.Info("putObject inline %v %v %v", erasure.blockSize, erasure.ShardSize(), erasure.ShardFileSize(data.ActualSize()))
 		inlineBuffers = make([]*bytes.Buffer, len(onlineDisks))
 	}
 

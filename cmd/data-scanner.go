@@ -23,6 +23,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/minio/minio/internal/logger"
 	"io/fs"
 	"math"
 	"math/rand"
@@ -193,6 +194,7 @@ func runDataScanner(ctx context.Context, objAPI ObjectLayer) {
 
 			bgHealInfo := readBackgroundHealInfo(ctx, objAPI)
 			scanMode := getCycleScanMode(cycleInfo.current, bgHealInfo.BitrotStartCycle, bgHealInfo.BitrotStartTime)
+			logger.Info("Data scanner started %v %v %v %v", cycleInfo.current, bgHealInfo.BitrotStartCycle, bgHealInfo.BitrotStartTime, scanMode)
 			if bgHealInfo.CurrentScanMode != scanMode {
 				newHealInfo := bgHealInfo
 				newHealInfo.CurrentScanMode = scanMode

@@ -1329,7 +1329,6 @@ func (er erasureObjects) putObject(ctx context.Context, bucket string, object st
 
 	// Initialize parts metadata
 	partsMetadata := make([]FileInfo, len(storageDisks))
-	logger.Info("putObject %v", pathJoin(bucket, object))
 	fi := newFileInfo(pathJoin(bucket, object), dataDrives, parityDrives)
 	fi.VersionID = opts.VersionID
 	if opts.Versioned && fi.VersionID == "" {
@@ -1379,7 +1378,6 @@ func (er erasureObjects) putObject(ctx context.Context, bucket string, object st
 
 	partName := "part.1"
 	tempErasureObj := pathJoin(uniqueID, fi.DataDir, partName)
-	logger.Info("putObject tempErasureObj %v", pathJoin(uniqueID, fi.DataDir, partName))
 
 	defer er.deleteAll(context.Background(), minioMetaTmpBucket, tempObj)
 
